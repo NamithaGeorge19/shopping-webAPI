@@ -8,26 +8,24 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace shopping_webAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration varConfiguration;
 
         public ProductController(IConfiguration configuration)
         {
-            _configuration = configuration;
+            varConfiguration = configuration;
         }
         // GET: api/<ProductController>
         [HttpGet]
-        public IEnumerable<Product> Get()
+        public IEnumerable<Product> GetProductList()
         {
             List<Product> productList = new List<Product>();
-            string connectionString = _configuration.GetConnectionString("ShoppingAppConnection");
+            string connectionString = varConfiguration.GetConnectionString("ShoppingAppConnection");
             DataSet dataset = new DataSet();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -37,7 +35,6 @@ namespace shopping_webAPI.Controllers
                 SqlDataAdapter dataAdapter = new SqlDataAdapter(sqlCommand);
                 dataAdapter.Fill(dataset);
             }
-            var test = dataset.Tables[0].Rows.Count;
             for (int i= 0; i < dataset.Tables[0].Rows.Count; i++)
             {
                 Product product = new Product();
@@ -50,22 +47,38 @@ namespace shopping_webAPI.Controllers
 
         // GET api/<ProductController>/5
         [HttpGet("{id}")]
-        public Product Get(int id)
+        public ProductDetail GetProductDetail(int id)
         {
-            Product varProduct = new Product();
-            varProduct = ProductDAL.GetProductDetails(id);
-            return varProduct;
+            ProductDetail product = new ProductDetail();
+            string connectionString = varConfiguration.GetConnectionString("ShoppingAppConnection");
+            DataSet dataSet = new DataSet();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand sqlCommand = new SqlCommand("GetProductById", connection);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@id", SqlDbType.Int).Value = id;
+
+                SqlDataAdapter dataAdapter = new SqlDataAdapter(sqlCommand);
+                dataAdapter.Fill(dataSet);
+                product.Id = Convert.ToInt32(dataSet.Tables[0].Rows[0]["Id"]);
+                product.Name = dataSet.Tables[0].Rows[0]["Name"].ToString();
+                product.Price = Convert.ToDecimal(dataSet.Tables[0].Rows[0]["Price"]);
+                product.Quantity = Convert.ToInt32(dataSet.Tables[0].Rows[0]["Quantity"]);
+            }
+            return product;
         }
 
         // POST api/<ProductController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void InsertProduct([FromBody] ProductDetail productDetail)
         {
+
         }
 
         // PUT api/<ProductController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(int id, [FromBody] ProductDetail productDetail)
         {
         }
 
