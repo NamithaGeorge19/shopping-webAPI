@@ -108,8 +108,17 @@ namespace shopping_webAPI.Controllers
 
         // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void DeleteProduct(int id)
         {
+            string connectionString = varConfiguration.GetConnectionString("ShoppingAppConnection");
+            using(SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("DeleteProduct", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", SqlDbType.Int).Value = id;
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

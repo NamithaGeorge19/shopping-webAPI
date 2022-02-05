@@ -100,7 +100,20 @@ namespace shopping_webAPI.Controllers
                 command.Parameters.AddWithValue("@Email", SqlDbType.VarChar).Value = sellerDetail.Email;
                 command.ExecuteNonQuery();
 
+            }
+        }
 
+        [HttpDelete("{id}")]
+        public void DeleteSeller(int id)
+        {
+            string connectionString = configuration.GetConnectionString("ShoppingAppConnection");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("DeleteSeller", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", SqlDbType.Int).Value = id;
+                command.ExecuteNonQuery();
             }
         }
 
