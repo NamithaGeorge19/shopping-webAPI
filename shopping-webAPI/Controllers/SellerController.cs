@@ -67,7 +67,42 @@ namespace shopping_webAPI.Controllers
             SellerDetail.Phone = Convert.ToString(dataSet.Tables[0].Rows[0]["Phone"]);
             SellerDetail.Email = Convert.ToString(dataSet.Tables[0].Rows[0]["Email"]);
             return SellerDetail;
+        }
+        [HttpPost]
+        public void InsertSeller([FromBody]SellerDetail sellerDetail)
+        {
+            String ConnectionString = configuration.GetConnectionString("ShoppingAppConnection");
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("InsertSeller", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@Name", SqlDbType.VarChar).Value = sellerDetail.Name;
+                command.Parameters.AddWithValue("@Phone", SqlDbType.VarChar).Value = sellerDetail.Phone;
+                command.Parameters.AddWithValue("@Email", SqlDbType.VarChar).Value = sellerDetail.Email;
+                command.ExecuteNonQuery();
+
+            }
 
         }
+        [HttpPut("{id}")]
+        public void UpdateSeller (int Id ,[FromBody]SellerDetail sellerDetail)
+        {
+            String ConnectionString = configuration.GetConnectionString("ShoppingAppConnection");
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("UpdateSeller", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", SqlDbType.Int).Value = Id;
+                command.Parameters.AddWithValue("@Name", SqlDbType.VarChar).Value = sellerDetail.Name;
+                command.Parameters.AddWithValue("@Phone", SqlDbType.VarChar).Value = sellerDetail.Phone;
+                command.Parameters.AddWithValue("@Email", SqlDbType.VarChar).Value = sellerDetail.Email;
+                command.ExecuteNonQuery();
+
+
+            }
+        }
+
     }
 }
