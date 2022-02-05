@@ -73,13 +73,37 @@ namespace shopping_webAPI.Controllers
         [HttpPost]
         public void InsertProduct([FromBody] ProductDetail productDetail)
         {
+            string connectionString = varConfiguration.GetConnectionString("ShoppingAppConnection");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand Command = new SqlCommand("insertProduct", connection);
+                Command.CommandType = CommandType.StoredProcedure;
+                Command.Parameters.AddWithValue("@Name", SqlDbType.VarChar).Value = productDetail.Name;
+                Command.Parameters.AddWithValue("@Price", SqlDbType.Decimal).Value = productDetail.Price;
+                Command.Parameters.AddWithValue("@Quantity", SqlDbType.Int).Value = productDetail.Quantity;
+                Command.ExecuteNonQuery();
 
+
+            }
         }
 
         // PUT api/<ProductController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] ProductDetail productDetail)
+        public void UpdateProduct(int id, [FromBody] ProductDetail productDetail)
         {
+            string connectionString = varConfiguration.GetConnectionString("ShoppingAppConnection");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand Command = new SqlCommand("updateProduct", connection);
+                Command.CommandType = CommandType.StoredProcedure;
+                Command.Parameters.AddWithValue("@id", SqlDbType.Int).Value = id;
+                Command.Parameters.AddWithValue("@Name", SqlDbType.VarChar).Value = productDetail.Name;
+                Command.Parameters.AddWithValue("@Price", SqlDbType.Decimal).Value = productDetail.Price;
+                Command.Parameters.AddWithValue("@Quantity", SqlDbType.Int).Value = productDetail.Quantity;
+                Command.ExecuteNonQuery();
+            }
         }
 
         // DELETE api/<ProductController>/5

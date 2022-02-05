@@ -22,8 +22,8 @@ namespace shopping_webAPI.Controllers
             configuration = _configuration;
         }
 
-        public CommandType CommandType { get; private set; }
 
+        [HttpGet]
         public IEnumerable<Seller> GetSellerList()
         {
             List<Seller> SellerList = new List<Seller>();
@@ -45,6 +45,29 @@ namespace shopping_webAPI.Controllers
                 SellerList.Add(Seller);
             }
             return SellerList;
+        }
+
+        [HttpGet("{id}")]
+        public SellerDetail GetSellerDetail(int Id)
+        {
+            SellerDetail SellerDetail = new SellerDetail();
+            string connectionString = configuration.GetConnectionString("ShoppingAppConnection");
+            DataSet dataSet = new DataSet();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand SqlCommand = new SqlCommand("GetSellerById", connection);
+                SqlCommand.CommandType = CommandType.StoredProcedure;
+                SqlCommand.Parameters.AddWithValue("@id", SqlDbType.Int).Value = Id;
+                SqlDataAdapter dataAdapter = new SqlDataAdapter(SqlCommand);
+                dataAdapter.Fill(dataSet);
+            }
+            SellerDetail.Id = Convert.ToInt32(dataSet.Tables[0].Rows[0]["Id"]);
+            SellerDetail.Name = Convert.ToString(dataSet.Tables[0].Rows[0]["Name"]);
+            SellerDetail.Phone = Convert.ToString(dataSet.Tables[0].Rows[0]["Phone"]);
+            SellerDetail.Email = Convert.ToString(dataSet.Tables[0].Rows[0]["Email"]);
+            return SellerDetail;
+
         }
     }
 }
