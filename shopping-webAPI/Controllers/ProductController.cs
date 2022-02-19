@@ -40,6 +40,7 @@ namespace shopping_webAPI.Controllers
                 Product product = new Product();
                 product.Id = Convert.ToInt32(dataset.Tables[0].Rows[i]["Id"]);
                 product.Name = dataset.Tables[0].Rows[i]["Name"].ToString();
+                product.Price = Convert.ToDecimal(dataset.Tables[0].Rows[i]["Price"]);
                 productList.Add(product);
             }
             return productList;
